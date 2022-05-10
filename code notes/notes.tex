@@ -1,0 +1,319 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[UTF8]{ctex}
+\usepackage[scale=0.8]{geometry}
+\usepackage{latexsym,amsmath,amsfonts,amssymb,mathrsfs,bm}
+\usepackage{abstract,appendix,titlesec,titletoc}
+\usepackage{diagbox,booktabs,longtable,tabularx}
+\usepackage[amsmath,thmmarks,hyperref]{ntheorem}
+\usepackage{fancyhdr,indentfirst}
+\usepackage[colorlinks=ture]{hyperref}
+\usepackage{makeidx,cleveref}
+\usepackage[sort&compress, numbers]{natbib}
+\usepackage{graphicx,epsfig,subfig}
+\usepackage{algorithm,algorithmicx,algpseudocode}
+\usepackage{xcolor}
+
+%\setlength{\lineskip}{\baselineskip}
+\setlength{\parskip}{0.5\baselineskip}
+
+\newtheorem{definition}{定义}
+\newtheorem{example}{例}
+\newtheorem{theorem}{定理}
+\newtheorem{lemma}{引理}
+\newtheorem{corollary}{推论}
+\newtheorem{remark}{注}
+\newtheorem{proposition}{性质}
+
+\title{保正插值代码细节}
+\author{sis-flag}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+区域$\Omega$是二维多边形区域。我们要在区域上求解稳态扩散问题
+\begin{align*}
+- \nabla \cdot (a \, \nabla u) = f \quad x \in \Omega \\
+u = u_0 \quad x \in \Gamma_D \\
+a \nabla u \cdot n = g \quad x \in \Gamma_N
+\end{align*}
+其中$u(x)$是未知函数，$a(x)$是$2 \times 2$对称正定的矩阵，表示张量型的扩散系数。
+
+\section*{非结构网格}
+
+非结构网格指的是不规则的多边形网格。二维网格中的要素有：节点(Point)，边(Edge)，单元(Unit)。三维的情况下，网格为多面体，要素有：节点(Point)，边(Edge)，面(Face)，体(Cell)。这里只考虑二维情况。
+
+理论上来说，想要记录二维网格的所有信息，只需要记录所有点的坐标，和每个单元的顶点是哪些（逆时针排序）就可以了。我们在保存网格信息的时候，也只需要把这两个数组写入文件。
+
+在编写数值格式的程序时，我们还需要计算网格更多的信息。数值格式中需要用到的属性有：每个点的坐标，每条边的中点坐标、边长和法向量，每个单元的中心坐标和面积，以及记录三者之间相互连接关系的表。具体每个类中具有的属性如下：
+
+\begin{tabular}{p{0.3\textwidth}p{0.3\textwidth}p{0.3\textwidth}}
+\hline
+ Point (节点) & Edge (边) & Unit (单元) \\
+\hline
+x, y (坐标) & mx, my (middle 中点坐标) & cx, cy (center 中心坐标) \\
+ & nx, ny (法向单位向量) & \\
+ & len (length 边的长度) & area (单元的面积) \\
+nE (neighbor edges 与之相连的边的编号) & nP (neighbor points 与之相连的节点的编号) & nP (neighbor points 与之相连的节点的编号) \\
+nU (neighbor units 与之相连的单元的编号) & nU (neighbor units 与之相连的单元的编号) & nE (neighbor edges 与之相连的边的编号) \\
+isbdp (is boundary point 布尔型 是否边界点) & & isbdu (布尔型 单元是否靠近边界) \\
+\hline
+\end{tabular}
+
+某条边是否是边界上的边不用存储，直接看它相邻单元的个数即可。
+
+边的法向量都是由$nU[1]$指向$nU[2]$的，如果在边界上，法向量默认指向区域外。同时，边的法向量也相当于由$nP[1]$指向$nP[2]$的方向向量顺时针旋转90度的方向。
+
+计算单元面积用的是这里的公式：\url{https://zhuanlan.zhihu.com/p/110025234}
+
+判断某一点是否在单元内部，用的是这里的公式\url{https://www.cnblogs.com/luxiaoxun/p/3722358.html}。
+
+\section*{九点格式}
+
+在单元$K$上，九点格式表示为
+\begin{align*}
+\sum_{e \in nE(K)} \mathcal{F}_{K, e} = |K| \, f(K)
+\end{align*}
+因此九点格式最终要求解的是一个$Units.len$维的线性方程组，右端项就是$|K| \, f(K)$。
+
+在程序中，我们要遍历每条边来装配总体的系数矩阵。
+
+边$e = AB$是一条位于内部的边，它的法向为$n_e$，从单元$K$指向单元$L$。
+
+边$e$上沿着$n_e$方向的流量为在两个单元上计算出的流量平均
+\begin{align*}
+\mathcal{F}_{e} = \frac12 (F_{K, e} + F_{L, e})
+\end{align*}
+
+在$K$单元上计算出的流量为
+\begin{align*}
+F_{K, e} = |e| \; (\alpha_{K,A} \, (u(K) - u(A)) + \alpha_{K,B} \, (u(K) - u(B)))
+\end{align*}
+其中的系数$\alpha_{K,A}, \alpha_{K,B}$由这个方程给出
+\begin{align*}
+a(K)^T n_{e} = \alpha_{K,A} \, \overrightarrow{KA} + \alpha_{K,B} \, \overrightarrow{KB}
+\end{align*}
+在$L$单元上计算流量方法类似。其中的系数$\alpha_{K,A}, \alpha_{K,B}$由这个方程给出。注意这里$n_e$的方向没变
+\begin{align*}
+a(L)^T n_{e} = \alpha_{L,A} \, \overrightarrow{LA} + \alpha_{K,B} \, \overrightarrow{LB}
+\end{align*}
+
+总的流量表达式为
+\begin{align*}
+F_{e} = \frac{|e|}{2} \; \left(\alpha_{K,A} \, (u(K) - u(A)) + \alpha_{K,B} \, (u(K) - u(B)) + \alpha_{L,A} \, (u(L) - u(A)) + \alpha_{L,B} \, (u(L) - u(B))\right)
+\end{align*}
+注意$n_e$上的流量既是单元$K$流出的，也是$L$流入的，因此边上的流量矩阵中，$K$和$L$对应的行一定互为相反数。
+
+网格节点处的函数值通过相邻的网格中心处函数值线性插值得到。
+\begin{align*}
+u(A) = \sum_{K \in \mathcal{N}(A)} w_{A,K} u(K)
+\end{align*}
+此时就可以把边界上的流量用单元中心表示出来。对于边$AB$上的流量，需要用到与$A$和$B$相邻的所有单元。
+
+考虑流量表达式中和$u(K),u(L)$有关的项，计算边上的流量时，相当于把边流量矩阵加到总体矩阵中去
+\begin{align*}
+\frac{|e|}{2}
+\left(
+\begin{matrix}
+\alpha_{K,A} + \alpha_{K,B} & \alpha_{L,A} + \alpha_{L,B} \\
+-\alpha_{K,A} - \alpha_{K,B} & -\alpha_{L,A} - \alpha_{L,B}
+\end{matrix}
+\right)
+\end{align*}
+它在总体矩阵中对应第$K,L$行和第$K,L$列。
+
+考虑流量表达式中和$u(A)$有关的项。如果节点$A$在区域内部，假设节点$A$相邻的单元编号为$K_1, K_2, \cdots, K_n$。边流量矩阵对应
+\begin{align*}
+-\frac{|e|}{2} (\alpha_{K,A} + \alpha_{L,A})
+\left(
+\begin{matrix}
+w_{A,K_1} & w_{A,K_2} & \cdots & w_{A,K_n} \\
+-w_{A,K_1} & -w_{A,K_2} & \cdots & -w_{A,K_n}
+\end{matrix}
+\right)
+\end{align*}
+它在总体矩阵中对应第$K,L$行和第$K_1, K_2, \cdots, K_n$列。
+
+流量表达式中和$u(B)$有关的项和它的计算方法是相同的。
+
+如果节点$A$在区域边界，它直接通过方程的边界条件得到，就是在右端项中$K,L$对应的位置加上
+\begin{align*}
+\frac{|e|}{2} (\alpha_{K,A} + \alpha_{L,A})
+\left(
+\begin{matrix}
+u(A) \\
+-u(A)
+\end{matrix}
+\right)
+\end{align*}
+
+下面考虑区域边界上的边。边$e = AB$是一条位于区域边界的边，它的法向为$n_e$，从单元$K$指向区域外。
+
+如果边上是Dirichelt边界条件，此时边上的流量就是
+\begin{align*}
+F_{e} = |e| \; (\alpha_{K,A} \, (u(K) - u(A)) + \alpha_{K,B} \, (u(K) - u(B)))
+\end{align*}
+由于$u(A),u(B)$可以用边界条件直接得到，这相当于直接在总体矩阵的第$K$行第$K$列加上
+\begin{align*}
+|e| \; (\alpha_{K,A} + \alpha_{K,B})
+\end{align*}
+然后在第$K$的单元对应的右端项处加上
+\begin{align*}
+|e| \; (\alpha_{K,A} \, u(A) + \alpha_{K,B} \,  u(B))
+\end{align*}
+
+如果边上是Neumann边界条件，此时边上的流量直接就是
+\begin{align*}
+F_{e} = \int_{e} g(x) \ dx \approx |e| \; g(e)
+\end{align*}
+用边的长度乘以$g(x)$在边中点上的取值得到。直接在$K$对应的右端项里减去它就可以。
+
+程序里只实现了Dirichlet边界条件。
+
+\section*{五点格式}
+
+五点格式中，我们首先假定单元节点上的函数值已知。我们同样要遍历每条边来装配总体的系数矩阵。
+
+边$e = AB$是一条位于内部的边，它的法向为$n_e$，从单元$K$指向单元$L$。
+
+单元$K$上计算的流量为
+\begin{align*}
+F_{K, e} = |e| \; (\alpha_1 \, (u(K) - u(P_1)) + \alpha_2 \, (u(K) - u(P_2)))
+\end{align*}
+其中$P_1, P_2$在$K$的顶点中选择，使联合法向量可以表示成这两个向量的凸组合。$\alpha_1, \alpha_2 > 0$是组合系数。
+\begin{align*}
+\kappa(K)^T n_{e} = \alpha_1 \, \overrightarrow{K P_1} + \alpha_2 \, \overrightarrow{K P_2}
+\end{align*}
+
+同理，在相邻的另一个单元上，我们也可以得到另一侧的流量$F_{L, e}$，对应凸组合的两个点是$P_3, P_4$。注意这里$n_{e}$是从$K$指向$L$的，因此要加负号。$\alpha_3, \alpha_4 > 0$是组合系数。
+\begin{align*}
+- \kappa(L)^T n_{e} = \alpha_3 \, \overrightarrow{L P_3} + \alpha_4 \, \overrightarrow{L P_4}
+\end{align*}
+
+我们可以把两个流加权平均起来，得到最终的流量
+\begin{align*}
+\mathcal{F}_{e} = & \mu_K \, F_{K, e} - \mu_L \, F_{L, e} 
+\end{align*}
+其中$\mu_K, \mu_L$是权重。表达式为
+\begin{align*}
+\mu_K = \frac{t_L}{t_K + t_L}, \quad \mu_L = \frac{t_K}{t_K + t_L}, \quad (t_K + t_L \neq 0). \qquad \mu_K = \mu_L = \frac12, \quad (t_K + t_L = 0).
+\end{align*}
+其中
+\begin{align*}
+t_K = \alpha_1 \, u(P_1) + \alpha_2 \, u(P_2), \quad t_L = \alpha_3 \, u(P_3) + \alpha_4 \, u(P_4)
+\end{align*}
+最终流量为
+\begin{align*}
+\mathcal{F}_{e} = |e| \left(\mu_K \, (\alpha_1 + \alpha_2) \, u(K) + \mu_L \, (\alpha_3 + \alpha_4) \, u(L) \right)
+\end{align*}
+
+最终流量里关于节点函数值的项已经被消掉了，只有和$u(K), u(L)$有关的项。因此在计算边上的流量时，只要把这个边流量矩阵加到总体矩阵中去
+\begin{align*}
+|e|
+\left(
+\begin{matrix}
+\mu_K \, (\alpha_1 + \alpha_2) & -\mu_L \, (\alpha_3 + \alpha_4) \\
+-\mu_K \, (\alpha_1 + \alpha_2) & \mu_L \, (\alpha_3 + \alpha_4) \\
+\end{matrix}
+\right)
+\end{align*}
+它在总体矩阵中对应第$K,L$行和第$K,L$列。
+
+
+边界条件的处理类似。如果边上是Dirichelt边界条件，此时边上的流量就是
+\begin{align*}
+F_{K, e} = |e| \; (\alpha_1 \, (u(K) - u(P_1)) + \alpha_2 \, (u(K) - u(P_2)))
+\end{align*}
+由于$u(A),u(B)$可以用边界条件直接得到，这相当于直接在总体矩阵的第$K$行第$K$列加上
+\begin{align*}
+|e| \; (\alpha_1 + \alpha_2)
+\end{align*}
+然后在第$K$的单元对应的右端项处加上
+\begin{align*}
+|e| \; (\alpha_1 \, u(P_1) + \alpha_2 \,  u(P_2))
+\end{align*}
+
+对于精确解为正的问题，变量$\alpha_1,\alpha_2,\alpha_3,\alpha_4,\mu_{K},\mu_{L},t_{K},t_{L}$都应该大于$0$，在程序里要仔细检查。
+
+\section*{插值方法}
+
+假设节点$A$相邻的单元编号为$K_1, K_2, \cdots, K_n$，这里通过$K_1, K_2, \cdots, K_n$的单元中心值线性组合近似$A$点处的函数值。这里计算的都是线性插值，我们只需要算出插值的权重$w$就可以了。
+
+平均插值就是权重全部为$1/n$。逆距离插值是把$K_1, K_2, \cdots, K_n$到$A$点距离的倒数归一化之后做为权重。这两种方法都是一阶的，但是保正。
+
+二阶插值的权重是下面这个优化问题的解，我们一方面想让插值和逆距离插值$w_0$接近，另一方面插值要满足二阶条件。
+\begin{align*}
+\min & \; \|w - w_0\|^2 \\
+s.t. & \; A w = b \quad w \geq 0
+\end{align*}
+其中
+\begin{align*}
+A = \left(
+\begin{matrix}
+1 & 1 & \cdots & 1 \\
+\frac{\partial u}{\partial x}^{(K_1)} (x_1 - x_A) & \frac{\partial u}{\partial x}^{(K_2)} (x_2 - x_A) & \cdots & \frac{\partial u}{\partial x}^{(K_n)} (x_n - x_A) \\
+\frac{\partial u}{\partial y}^{(K_1)} (y_1 - y_A) & \frac{\partial u}{\partial y}^{(K_2)} (y_2 - y_A) & \cdots & \frac{\partial u}{\partial y}^{(K_n)} (y_n - y_A) \\
+\end{matrix}
+\right)
+\quad
+b = \left(
+\begin{matrix}
+1 \\
+0 \\
+0 \\
+\end{matrix}
+\right)
+\end{align*}
+
+优化问题的解为
+\begin{align*}
+\lambda = (A \, A^T)^{-1} (A \, w_0 - b) \qquad w = w_0 - A^T \lambda
+\end{align*}
+
+扩散系数在整个区域上可能出现间断，这会导致解的梯度不连续，也就是$\nabla u^{(K_i)}$不一定相等。下面给出求$\nabla u^{(K_i)}$的公式。
+
+由于我们事先知道间断线的位置，我们可以在生成网格的时候把网格边放在间断线处。可以假设$\nabla u^{(K_i)}$在单元内部是连续的。设$n_i$是$K_i$和$K_{i+1}$单元之间对应边的法向量，$t_i$是对应的方向向量。
+
+相邻两个单元之间的流连续条件为
+\begin{align*}
+n_i^T \, (\kappa^{(K_i)} \, \nabla u^{(K_i)}) = n_i^T \, (\kappa^{(K_{i+1})} \, \nabla u^{(K_{i+1})})
+\end{align*}
+由于解是连续的，解的梯度应该在切向相同
+\begin{align*}
+t_i^T \, \nabla u^{(K_i)} = t_i^T \, \nabla u^{(K_{i+1})}
+\end{align*}
+
+梯度要满足的方程为
+\begin{align*}
+\left(
+\begin{matrix}
+n_1^T \kappa^{(K_1)} & -n_1^T \kappa^{(K_2)} &  &  &  \\
+t_1^T & -t_1^T &  &  &  \\
+ & n_2^T \kappa^{(K_2)} & -n_2^T \kappa^{(K_3)} &  &  \\
+ & t_2^T & -t_2^T &  &  \\
+ &  & \ddots & \ddots & \ddots \\
+-n_n^T \kappa^{(K_1)} &  &  &  & n_n^T \kappa^{(K_n)} \\
+-t_n^T &  &  &  & t_n^T
+\end{matrix}
+\right)
+\left(
+\begin{matrix}
+\nabla u^{(K_1)} \\
+\nabla u^{(K_2)} \\
+\vdots \\
+\nabla u^{(K_n)} \\
+\end{matrix}
+\right)
+= 0
+\end{align*}
+这里面有$2n$个方程，$2n$个未知数，而且是齐次方程，应该只有零解。但是零解肯定不是我们想要的，这里我们找另一种形式的最小二乘解。
+$$ \min_{\|x\| = 1} \|A x\| $$
+从这个角度考虑，得到的梯度应该是系数矩阵最小奇异值对应的右奇异向量。
+
+这样就可以算出梯度，进而得到二阶插值。
+
+二阶插值不一定保正。我们的策略是，先用二阶插值试一试，如果得到的结果是保正的，就留下，如果权重中存在小于0的值，就改成逆距离插值。
+
+\end{document}

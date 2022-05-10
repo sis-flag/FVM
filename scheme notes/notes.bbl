@@ -1,0 +1,15 @@
+\begin{thebibliography}{1}
+
+\bibitem{Sheng2008}
+Z.~Sheng and G.~Yuan.
+\newblock A nine point scheme for the approximation of diffusion operators on
+  distorted quadrilateral meshes.
+\newblock {\em SIAM Journal on Scientific Computing}, 30(3):1341--1361, 2008.
+
+\bibitem{Yuan2008}
+G.~Yuan and Z.~Sheng.
+\newblock Monotone finite volume schemes for diffusion equations on polygonal
+  meshes.
+\newblock {\em Journal of Computational Physics}, page 6288–6312, 2008.
+
+\end{thebibliography}

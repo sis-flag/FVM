@@ -7,13 +7,21 @@ old_path = path(old_path, './interp');
 
 PDE = linear_stab10();
 
-all_Mesh = cell(6,1);
-all_Mesh{1} = load_mesh_file('mesh/mesh1_1.txt');
-all_Mesh{2} = load_mesh_file('mesh/mesh1_2.txt');
-all_Mesh{3} = load_mesh_file('mesh/mesh1_3.txt');
-all_Mesh{4} = load_mesh_file('mesh/mesh1_4.txt');
-all_Mesh{5} = load_mesh_file('mesh/mesh1_5.txt');
-all_Mesh{6} = load_mesh_file('mesh/mesh1_6.txt');
+% all_Mesh = cell(6,1);
+% all_Mesh{1} = load_mesh_file('mesh/mesh1_1.txt');
+% all_Mesh{2} = load_mesh_file('mesh/mesh1_2.txt');
+% all_Mesh{3} = load_mesh_file('mesh/mesh1_3.txt');
+% all_Mesh{4} = load_mesh_file('mesh/mesh1_4.txt');
+% all_Mesh{5} = load_mesh_file('mesh/mesh1_5.txt');
+% all_Mesh{6} = load_mesh_file('mesh/mesh1_6.txt');
+
+
+all_Mesh = cell(5,1);
+all_Mesh{1} = load_mesh_file('mesh/mesh3_1.txt');
+all_Mesh{2} = load_mesh_file('mesh/mesh3_2.txt');
+all_Mesh{3} = load_mesh_file('mesh/mesh3_3.txt');
+all_Mesh{4} = load_mesh_file('mesh/mesh3_4.txt');
+all_Mesh{5} = load_mesh_file('mesh/mesh3_5.txt');
 
 %% NPS
 NPS_Linf = zeros(length(all_Mesh), 1, 'double');

@@ -8,13 +8,16 @@ old_path = path(old_path, './interp');
 PDE = linear_stab6();
 
 p = 0.7;
-all_Mesh = cell(6,1);
-all_Mesh{1} = get_sin_mesh(4, 4, p);
-all_Mesh{2} = get_sin_mesh(8, 8, p);
+all_Mesh = cell(9,1);
+all_Mesh{1} = get_sin_mesh(8, 8, p);
+all_Mesh{2} = get_sin_mesh(11, 11, p);
 all_Mesh{3} = get_sin_mesh(16, 16, p);
-all_Mesh{4} = get_sin_mesh(32, 32, p);
-all_Mesh{5} = get_sin_mesh(64, 64, p);
-all_Mesh{6} = get_sin_mesh(128, 128, p);
+all_Mesh{4} = get_sin_mesh(23, 23, p);
+all_Mesh{5} = get_sin_mesh(32, 32, p);
+all_Mesh{6} = get_sin_mesh(45, 45, p);
+all_Mesh{7} = get_sin_mesh(64, 64, p);
+all_Mesh{8} = get_sin_mesh(90, 90, p);
+all_Mesh{9} = get_sin_mesh(128, 128, p);
 
 all_gamma = [0.01, 0.1, 1, 10, 100];
 
@@ -88,13 +91,15 @@ for k = 2:length(all_gamma)+2
     plot(sqrt(nEs), Linf(:,k), '-*');
 end
 legend(leg)
-xlim([3, 3e2])
-xlabel('sqrt(DoF)')
+grid('on')
+xlim([5, 3e2])
+ylim([1e-4, 1e2])
+xlabel('sqrt(nkw)')
 ylabel('L^\infty error')
 set(gca, 'XScale', 'log')
 set(gca, 'YScale', 'log')
-set(gca, 'FontSize', 16)
-set(gcf, 'Position', [200, 200, 500, 500])
+set(gca, 'FontSize', 12)
+set(gcf, 'Position', [200, 200, 400, 400])
 print('pics/m6-inf.eps','-depsc','-loose')
 
 figure
@@ -105,11 +110,13 @@ for k = 2:length(all_gamma)+2
     plot(sqrt(nEs), L2(:,k), '-*');
 end
 legend(leg)
-xlim([3, 3e2])
-xlabel('sqrt(DoF)')
+grid('on')
+xlim([5, 3e2])
+ylim([1e-4, 1e2])
+xlabel('sqrt(nkw)')
 ylabel('L^2 error')
 set(gca, 'XScale', 'log')
 set(gca, 'YScale', 'log')
-set(gca, 'FontSize', 16)
-set(gcf, 'Position', [200, 200, 500, 500])
+set(gca, 'FontSize', 12)
+set(gcf, 'Position', [200, 200, 400, 400])
 print('pics/m6-2.eps','-depsc','-loose')

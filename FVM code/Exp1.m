@@ -18,7 +18,7 @@ all_Mesh{6} = get_sin_mesh(16, 16, 0.7);
 for k = 1:length(all_Mesh)
     figure
     plot_mesh(all_Mesh{k});
-    set(gcf, 'Position', [200, 200, 500, 500])
+    set(gcf, 'Position', [200, 200, 300, 300])
     print(['pics/m', int2str(k),'.eps'],'-depsc','-loose')
 end
 

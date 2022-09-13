@@ -39,10 +39,10 @@ for k = 1:length(all_Mesh)
     [A, F] = mat_NPS(Mesh, PDE, weight);
     u = A \ F;
     
-    NPS_Linf(k) = norm_cell(Mesh, u - u_exact, inf) / ...
-        norm_cell(Mesh, u_exact, inf);
-    NPS_L2(k) = norm_cell(Mesh, u - u_exact, 2) / ...
-        norm_cell(Mesh, u_exact, 2);
+    NPS_Linf(k) = norm_unit(Mesh, u - u_exact, inf) / ...
+        norm_unit(Mesh, u_exact, inf);
+    NPS_L2(k) = norm_unit(Mesh, u - u_exact, 2) / ...
+        norm_unit(Mesh, u_exact, 2);
 end
 
 %% EBS1

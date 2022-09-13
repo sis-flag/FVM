@@ -15,6 +15,14 @@ end
         end
     end
 
+    function du = du(x, y)
+        if x < 0.5
+            du = [4*y+6; 4*x-2*fn*y+2];
+        else
+            du = [0; 4-2*fn*y] + [4*y+6; 4*x-2]/delta;
+        end
+    end
+
     function a = a(x, ~, ~)
         if x < 0.5
             a = [1, 0; 0, 1];
@@ -32,5 +40,5 @@ end
     end
 
 
-PDE = struct('a', @a, 'u', @u, 'f', @f);
+PDE = struct('a', @a, 'u', @u, 'f', @f, 'du', @du);
 end

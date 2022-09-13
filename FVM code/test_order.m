@@ -4,6 +4,8 @@ old_path = path;
 old_path = path(old_path, './mesh');
 old_path = path(old_path, './PDE');
 old_path = path(old_path, './interp');
+old_path = path(old_path, './scheme');
+old_path = path(old_path, './utils');
 
 PDE = linear_stab0();
 
@@ -68,8 +70,8 @@ for k = 1:length(all_Mesh)
     u = A \ F;
     
 %     err = max(abs(u - u_exact));
-    err = norm_cell(Mesh, u - u_exact, 2) / ...
-                norm_cell(Mesh, u_exact, 2);
+    err = norm_unit(Mesh, u - u_exact, 2) / ...
+                norm_unit(Mesh, u_exact, 2);
     
     nU = Mesh.nU;
     fprintf('%d & %.2e & %g \n', nU, err, ...

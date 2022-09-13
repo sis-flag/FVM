@@ -4,6 +4,11 @@ function PDE = linear_stab2()
         u = sin((x-1)*(y-1)) - (x-1)^3 * (y-1)^2;
     end
 
+    function du = du(x, y)
+        du = [cos((x-1)*(y-1))*(y-1) - 3*(x-1)^2*(y-1)^2; ...
+              cos((x-1)*(y-1))*(x-1) - 2*(y-1)*(x-1)^3];
+    end
+
     function a = a(~, ~, ~)
         a = [1.5, 0.5; 0.5, 1.5];
     end
@@ -14,5 +19,5 @@ function PDE = linear_stab2()
             - cos((x-1)*(y-1));
     end
 
-PDE = struct('a', @a, 'u', @u, 'f', @f);
+PDE = struct('a', @a, 'u', @u, 'f', @f, 'du', @du);
 end

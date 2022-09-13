@@ -90,23 +90,7 @@ for U = 1:nU
     xc(U) = mean(coord(1, U2P{U}));
     yc(U) = mean(coord(2, U2P{U}));
     
-    % area is calculated by the formula in
-    % https://zhuanlan.zhihu.com/p/110025234
-    nPs = U2P{U};
-    tarea = 0;
-    
-    for k = 1:length(nPs)
-        if k == 1
-            xp0 = coord(:, nPs(end));
-            xp1 = coord(:, nPs(1));
-        else
-            xp0 = coord(:, nPs(k-1));
-            xp1 = coord(:, nPs(k));
-        end
-        tarea = tarea + det([xp0, xp1]);
-    end
-    
-    area(U) = 0.5 * abs(tarea);
+    area(U) = get_area(coord(1, U2P{U}), coord(2, U2P{U}));
 end
 
 for E = 1:nE

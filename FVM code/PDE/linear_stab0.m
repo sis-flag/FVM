@@ -4,6 +4,10 @@ function PDE = linear_stab0()
         u = x + y + 1;
     end
 
+    function du = du(~, ~)
+        du = [1; 1];
+    end
+
     function a = a(~, ~, ~)
         a = [1, 0; 0, 1];
     end
@@ -13,5 +17,5 @@ function PDE = linear_stab0()
     end
 
 
-PDE = struct('a', @a, 'u', @u, 'f', @f);
+PDE = struct('a', @a, 'u', @u, 'f', @f, 'du', @du);
 end

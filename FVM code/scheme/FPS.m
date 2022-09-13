@@ -1,4 +1,4 @@
-function [Amat, F] = mat_FPS(Mesh, PDE, up, uc)
+function [Amat, F] = FPS(Mesh, PDE, up, uc)
 
 if nargin < 4
     uc = zeros(Mesh.nU, 1);

@@ -24,7 +24,7 @@ u = A \ F;
 
 L2_err = norm_edge(Mesh, u - u_exact, 2) / norm_edge(Mesh, u_exact, 2);
 Linf_err = norm_edge(Mesh, u - u_exact, inf) / norm_edge(Mesh, u_exact, inf);
-fprintf('EBS-1: L2 error %.2e, Linf error %.2e\n', L2_err, Linf_err)
+fprintf('ECS-I: L2 error %.2e, Linf error %.2e\n', L2_err, Linf_err)
 
 %% EBS1 plot
 figure
@@ -49,7 +49,7 @@ u = A \ F;
 
 L2_err = norm_edge(Mesh, u - u_exact, 2) / norm_edge(Mesh, u_exact, 2);
 Linf_err = norm_edge(Mesh, u - u_exact, inf) / norm_edge(Mesh, u_exact, inf);
-fprintf('EBS-2: L2 error %.2e, Linf error %.2e\n', L2_err, Linf_err)
+fprintf('ECS-II: L2 error %.2e, Linf error %.2e\n', L2_err, Linf_err)
 
 %% EBS2 plot
 figure
@@ -86,7 +86,7 @@ u = A \ F;
 
 L2_err = norm_edge(Mesh, u - u_exact, 2) / norm_edge(Mesh, u_exact, 2);
 Linf_err = norm_edge(Mesh, u - u_exact, inf) / norm_edge(Mesh, u_exact, inf);
-fprintf('EBS-1: L2 error %.2e, Linf error %.2e\n', L2_err, Linf_err)
+fprintf('ECS-I: L2 error %.2e, Linf error %.2e\n', L2_err, Linf_err)
 
 %% EBS1 plot
 figure
@@ -111,7 +111,7 @@ u = A \ F;
 
 L2_err = norm_edge(Mesh, u - u_exact, 2) / norm_edge(Mesh, u_exact, 2);
 Linf_err = norm_edge(Mesh, u - u_exact, inf) / norm_edge(Mesh, u_exact, inf);
-fprintf('EBS-2: L2 error %.2e, Linf error %.2e\n', L2_err, Linf_err)
+fprintf('ECS-II: L2 error %.2e, Linf error %.2e\n', L2_err, Linf_err)
 
 %% EBS2 plot
 figure

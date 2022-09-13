@@ -37,10 +37,10 @@ for k = 1:length(all_Mesh)
     [A, F] = mat_NPS(Mesh, PDE, weight);
     u = A \ F;
     
-    Linf(k, 1) = norm_cell(Mesh, u - u_exact, inf) / ...
-        norm_cell(Mesh, u_exact, inf);
-    L2(k, 1) = norm_cell(Mesh, u - u_exact, 2) / ...
-        norm_cell(Mesh, u_exact, 2);
+    Linf(k, 1) = norm_unit(Mesh, u - u_exact, inf) / ...
+        norm_unit(Mesh, u_exact, inf);
+    L2(k, 1) = norm_unit(Mesh, u - u_exact, 2) / ...
+        norm_unit(Mesh, u_exact, 2);
     
     u_exact = zeros(Mesh.nE, 1);
     for E = 1:Mesh.nE
@@ -78,45 +78,48 @@ end
 leg = cell(length(all_gamma)+3, 1);
 leg{1} = 'slope=-2';
 leg{2} = 'NPS';
-leg{3} = 'EBS-1';
+leg{3} = 'ECS-I';
 for k = 1:length(all_gamma)
-    leg{k+3} = sprintf('EBS-2(\\gamma=%g)', all_gamma(k));
+    leg{k+3} = sprintf('ECS-II(\\gamma=%g)', all_gamma(k));
 end
 
 figure
+set(gcf, 'Position', [200, 200, 1000, 400])
+
+subplot(1,2,1)
 hold on
-plot([8, 128], 7*[8^(-2), 128^(-2)], 'k--')
+plot([8, 180], 7*[8^(-2), 180^(-2)], 'k--')
 plot(sqrt(nUs), Linf(:,1), 'm-*');
 for k = 2:length(all_gamma)+2
     plot(sqrt(nEs), Linf(:,k), '-*');
 end
-legend(leg)
 grid('on')
 xlim([5, 3e2])
-ylim([1e-4, 1e2])
+ylim([8e-5, 8e0])
 xlabel('sqrt(nkw)')
 ylabel('L^\infty error')
 set(gca, 'XScale', 'log')
 set(gca, 'YScale', 'log')
 set(gca, 'FontSize', 12)
-set(gcf, 'Position', [200, 200, 400, 400])
-print('pics/m6-inf.eps','-depsc','-loose')
+set(gca, 'Position', [0.1, 0.15, 0.3, 0.8])
 
-figure
+subplot(1,2,2)
 hold on
-plot([8, 128], 3*[8^(-2), 128^(-2)], 'k--')
+plot([8, 180], 3*[8^(-2), 180^(-2)], 'k--')
 plot(sqrt(nUs), L2(:,1), 'm-*');
 for k = 2:length(all_gamma)+2
     plot(sqrt(nEs), L2(:,k), '-*');
 end
-legend(leg)
 grid('on')
 xlim([5, 3e2])
-ylim([1e-4, 1e2])
+ylim([5e-5, 5e0])
 xlabel('sqrt(nkw)')
 ylabel('L^2 error')
 set(gca, 'XScale', 'log')
 set(gca, 'YScale', 'log')
 set(gca, 'FontSize', 12)
-set(gcf, 'Position', [200, 200, 400, 400])
-print('pics/m6-2.eps','-depsc','-loose')
+set(gca, 'Position', [0.5, 0.15, 0.3, 0.8])
+
+o_o = legend(leg);
+set(o_o, 'Position', [0.85, 0.5, 0.1, 0.4])
+print('pics/m6err.eps','-depsc','-loose')

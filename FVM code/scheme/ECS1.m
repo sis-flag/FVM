@@ -1,4 +1,4 @@
-function [Amat, F] = mat_EBS1(Mesh, PDE)
+function [Amat, F] = ECS1(Mesh, PDE)
 
 all_a = cell(Mesh.nU, 1);
 for U = 1:Mesh.nU

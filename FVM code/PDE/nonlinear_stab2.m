@@ -8,6 +8,10 @@ end
         u = sin(pi*x) * sin(pi*y) + b;
     end
 
+    function du = du(x, y)
+        du = pi * [cos(pi*x)*sin(pi*y); cos(pi*y)*sin(pi*x)];
+    end
+
     function a = a(~, ~, u)
         a = (k * u + e) * eye(2);
     end
@@ -19,5 +23,5 @@ end
         f = pi*pi*f;
     end
 
-PDE = struct('a', @a, 'u', @u, 'f', @f);
+PDE = struct('a', @a, 'u', @u, 'f', @f, 'du', @du);
 end

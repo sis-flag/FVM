@@ -4,6 +4,7 @@ old_path = path;
 old_path = path(old_path, './mesh');
 old_path = path(old_path, './PDE');
 old_path = path(old_path, './interp');
+old_path = path(old_path, './post');
 
 %% mesh
 all_Mesh = cell(6,1);
@@ -57,10 +58,10 @@ end
 
 %% table
 Tab{1} = '';
-Tab{2} = '$L^2$ (EBS-1)';
-Tab{3} = '$L^\\infty$ (EBS-1)';
-Tab{4} = '$L^2$ (EBS-2)';
-Tab{5} = '$L^\\infty$ (EBS-2)';
+Tab{2} = '$L^2$ (ECS-I)';
+Tab{3} = '$L^\\infty$ (ECS-I)';
+Tab{4} = '$L^2$ (ECS-II)';
+Tab{5} = '$L^\\infty$ (ECS-II)';
 for k = 1:length(all_Mesh)
     Tab{1} = [Tab{1}, sprintf(' & mesh %d', k)];
     Tab{2} = [Tab{2}, sprintf(' & %.2e', EBS1_L2(k))];

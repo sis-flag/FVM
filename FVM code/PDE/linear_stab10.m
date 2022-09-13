@@ -22,6 +22,19 @@ alpha = delta.^[-1 ,1, 2, -2];
         u = alpha(k) * sin(2*pi*x) * sin(2*pi*y);
     end
 
+    function du = du(x, y)
+        if x < 0.5 && y < 0.5
+            k = 1;
+        elseif  x >= 0.5 && y < 0.5
+            k = 2;
+        elseif  x >= 0.5 && y >= 0.5
+            k = 3;
+        elseif  x < 0.5 && y >= 0.5
+            k = 4;
+        end
+        du = alpha(k)*pi * [cos(pi*x)*sin(pi*y); cos(pi*y)*sin(pi*x)];
+    end
+
     function a = a(x, y, ~)
         if x < 0.5 && y < 0.5
             k = 1;
@@ -50,5 +63,5 @@ alpha = delta.^[-1 ,1, 2, -2];
     end
 
 
-PDE = struct('a', @a, 'u', @u, 'f', @f);
+PDE = struct('a', @a, 'u', @u, 'f', @f, 'du', @du);
 end

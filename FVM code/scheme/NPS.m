@@ -1,4 +1,4 @@
-function [Amat, F] = mat_NPS(Mesh, PDE, weight, uc)
+function [Amat, F] = NPS(Mesh, PDE, weight, uc)
 
 if nargin < 4
     uc = zeros(Mesh.nU, 1);

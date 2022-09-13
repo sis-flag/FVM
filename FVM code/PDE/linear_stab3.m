@@ -6,9 +6,9 @@ end
 
 % syms x y delta
 % u = sin(2*pi*x) * exp(-2*pi/sqrt(delta)*y)
-% K = [1, 0; 0, delta]
-% Ku = K * [diff(u, x); diff(u, y)]
-% f = - diff(Ku(1), x) - diff(Ku(2), y)
+% a = [1, 0; 0, delta]
+% F = a * [diff(u, x); diff(u, y)]
+% f = - diff(F(1), x) - diff(F(2), y)
 % simplify(expand(f))
 % g0y = subs(-Ku(1), x, 0)
 % g1y = subs(Ku(1), x, 1)
@@ -19,6 +19,11 @@ end
         u = sin(2*pi*x) * exp(-2*pi/sqrt(delta)*y);
     end
 
+    function du = du(~, ~)
+        du = [2*pi*cos(2*pi*x) * exp(-2*pi/sqrt(delta)*y); ...
+             -2*pi*sin(2*pi*x) * exp(-2*pi/sqrt(delta)*y) / sqrt(delta)];
+    end
+
     function a = a(~, ~, ~)
         a = [1, 0; 0, delta];
     end
@@ -27,17 +32,5 @@ end
         f = 0;
     end
 
-%     function g = g(x, y)
-%         if x == 0
-%             g = -2*pi*exp(-(2*pi*y)/delta^(1/2));
-%         elseif x == 1
-%             g = 2*pi*exp(-(2*pi*y)/delta^(1/2));
-%         elseif y == 0
-%             g = 2*delta^(1/2)*pi*sin(2*pi*x);
-%         elseif y == 1
-%             g = -2*delta^(1/2)*pi*exp(-(2*pi)/delta^(1/2))*sin(2*pi*x);
-%         end
-%     end
-
-PDE = struct('a', @a, 'u', @u, 'f', @f);
+PDE = struct('a', @a, 'u', @u, 'f', @f, 'du', @du);
 end

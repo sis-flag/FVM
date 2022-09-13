@@ -25,7 +25,7 @@
 \newtheorem{remark}{注}
 \newtheorem{proposition}{性质}
 
-\title{保正插值代码细节}
+\title{有限体积法代码细节}
 \author{sis-flag}
 \date{\today}
 
@@ -39,7 +39,7 @@
 u = u_0 \quad x \in \Gamma_D \\
 a \nabla u \cdot n = g \quad x \in \Gamma_N
 \end{align*}
-其中$u(x)$是未知函数，$a(x)$是$2 \times 2$对称正定的矩阵，表示张量型的扩散系数。
+其中$u(x)$是未知函数，$a(x)$是$2 \times 2$对称正定的矩阵，表示扩散系数。
 
 \section*{非结构网格}
 
@@ -53,7 +53,7 @@ a \nabla u \cdot n = g \quad x \in \Gamma_N
 \hline
  Point (节点) & Edge (边) & Unit (单元) \\
 \hline
-x, y (坐标) & mx, my (middle 中点坐标) & cx, cy (center 中心坐标) \\
+xp, yp (坐标) & xe, ye (middle 中点坐标) & xc, yc (center 中心坐标) \\
  & nx, ny (法向单位向量) & \\
  & len (length 边的长度) & area (单元的面积) \\
 nE (neighbor edges 与之相连的边的编号) & nP (neighbor points 与之相连的节点的编号) & nP (neighbor points 与之相连的节点的编号) \\

@@ -4,11 +4,13 @@ old_path = path;
 old_path = path(old_path, './mesh');
 old_path = path(old_path, './PDE');
 old_path = path(old_path, './interp');
+old_path = path(old_path, './scheme');
+old_path = path(old_path, './utils');
 
 %% Mesh
 % Mesh = load_mesh_file('mesh/mesh1_2.txt');
 
-load mesh/mesh11_1
+load mesh/mesh11_3
 Mesh = arrange_polygonal(coord, U2P);
 
 % Mesh = get_Kershaw_mesh(8, 8, 0.1);
@@ -31,8 +33,8 @@ for E = 1:Mesh.nE
 end
 
 %% NPS
-weight = interp_my_weight(Mesh, PDE);
-[A, F] = mat_NPS(Mesh, PDE, weight);
+weight = geo_order2_weight(Mesh, PDE);
+[A, F] = NPS(Mesh, PDE, weight);
 u = A \ F;
 
 disp('NPS Linf error')
@@ -42,7 +44,7 @@ disp(max(abs(ueU - u)))
 % u0 = zeros(Mesh.nU, 1);
 % for nit = 1:300
 %     up = interp_order2_limit(Mesh, PDE, u0);
-%     [A, F] = mat_FPS(Mesh, PDE, up, u0);
+%     [A, F] = FPS(Mesh, PDE, up, u0);
 %     u1 = A \ F;
 % 
 %     if norm(u0 - u1) < 1e-10
@@ -56,17 +58,17 @@ disp(max(abs(ueU - u)))
 % disp(max(abs(ueU - u1)))
 
 %% EBS1
-[A, F] = mat_EBS1(Mesh, PDE);
+[A, F] = ECS1(Mesh, PDE);
 u = A \ F;
 
-disp('EBS-1 Linf error')
+disp('ECS-I Linf error')
 disp(max(abs(ueE - u)))
 
 %% EBS2
-[A, F] = mat_EBS2(Mesh, PDE);
+[A, F] = ECS2(Mesh, PDE);
 u = A \ F;
 
-disp('EBS-2 Linf error')
+disp('ECS-II Linf error')
 disp(max(abs(ueE - u)))
 
 %% plot

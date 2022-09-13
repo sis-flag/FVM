@@ -35,7 +35,7 @@
 \newcommand{\by}{\mathbf{y}}
 \newcommand{\bn}{\mathbf{n}}
 
-\title{任意网格上的边自由度有限体积格式}
+\title{边中点有限体积格式}
 \author{刘子旗~\&~苗帅}
 \date{\today}
 
@@ -43,9 +43,11 @@
 
 \maketitle
 
-一般在扭曲网格上的有限体积格式，未知量都定义在单元中心和网格节点上。这里我们构造一族未知量定义在网格边上的有限体积格式。对于边自由度有限体积的框架下，我们证明了收敛性。
+一般在扭曲网格上的有限体积格式，未知量都定义在单元中心和网格节点上。这里我们构造一族未知量定义在网格边上的有限体积格式。
 
 \section*{问题介绍}
+
+\subsection*{稳态扩散方程}
 
 区域$\Omega$是二维多边形区域。我们要在区域上求解稳态扩散问题
 \begin{equation*}
@@ -65,7 +67,7 @@ u(x) = u_0 & \quad x \in \partial \Omega
 \label{f1}
 \end{figure}
 
-\section*{格式构造}
+\section*{格式构造（零）}
 
 在图中虚线围成的四边形$AKBL$中，对方程两边积分，用散度定理得到
 \begin{equation*}

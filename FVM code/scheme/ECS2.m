@@ -1,4 +1,4 @@
-function [Amat, F] = mat_EBS2(Mesh, PDE, gamma)
+function [Amat, F] = ECS2(Mesh, PDE, gamma)
 
 if nargin < 3
     gamma = 1;

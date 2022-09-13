@@ -8,6 +8,10 @@ end
         u = sin(pi*x) * sin(pi*y);
     end
 
+    function du = du(x, y)
+        du = pi * [cos(pi*x)*sin(pi*y); cos(pi*y)*sin(pi*x)];
+    end
+
     function a = a(x, y, ~)
         rt = x*x+y*y ;
         a = [delta*x*x+y*y,  -(1-delta)*x*y ; -(1-delta)*x*y, x*x+delta*y*y] / rt;
@@ -38,5 +42,5 @@ end
     end
 
 
-PDE = struct('a', @a, 'u', @u, 'f', @f);
+PDE = struct('a', @a, 'u', @u, 'f', @f, 'du', @du);
 end

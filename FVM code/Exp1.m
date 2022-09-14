@@ -4,7 +4,8 @@ old_path = path;
 old_path = path(old_path, './mesh');
 old_path = path(old_path, './PDE');
 old_path = path(old_path, './interp');
-old_path = path(old_path, './post');
+old_path = path(old_path, './scheme');
+old_path = path(old_path, './utils');
 
 %% mesh
 all_Mesh = cell(6,1);
@@ -26,10 +27,10 @@ end
 %% test
 PDE = linear_stab0();
 
-EBS1_Linf = zeros(length(all_Mesh), 1, 'double');
-EBS1_L2 = zeros(length(all_Mesh), 1, 'double');
-EBS2_Linf = zeros(length(all_Mesh), 1, 'double');
-EBS2_L2 = zeros(length(all_Mesh), 1, 'double');
+ECS1_Linf = zeros(length(all_Mesh), 1, 'double');
+ECS1_L2 = zeros(length(all_Mesh), 1, 'double');
+ECS2_Linf = zeros(length(all_Mesh), 1, 'double');
+ECS2_L2 = zeros(length(all_Mesh), 1, 'double');
 for k = 1:length(all_Mesh)
     Mesh = all_Mesh{k};
     
@@ -39,20 +40,20 @@ for k = 1:length(all_Mesh)
         u_exact(E) = PDE.u(xc, yc);
     end
 
-    [A, F] = mat_EBS1(Mesh, PDE);
+    [A, F] = ECS1(Mesh, PDE);
     u = A \ F;
 
-    EBS1_Linf(k) = norm_edge(Mesh, u - u_exact, inf) / ...
+    ECS1_Linf(k) = norm_edge(Mesh, u - u_exact, inf) / ...
         norm_edge(Mesh, u_exact, inf);
-    EBS1_L2(k) = norm_edge(Mesh, u - u_exact, 2) / ...
+    ECS1_L2(k) = norm_edge(Mesh, u - u_exact, 2) / ...
         norm_edge(Mesh, u_exact, 2);
     
-    [A, F] = mat_EBS2(Mesh, PDE);
+    [A, F] = ECS2(Mesh, PDE);
     u = A \ F;
 
-    EBS2_Linf(k) = norm_edge(Mesh, u - u_exact, inf) / ...
+    ECS2_Linf(k) = norm_edge(Mesh, u - u_exact, inf) / ...
         norm_edge(Mesh, u_exact, inf);
-    EBS2_L2(k) = norm_edge(Mesh, u - u_exact, 2) / ...
+    ECS2_L2(k) = norm_edge(Mesh, u - u_exact, 2) / ...
         norm_edge(Mesh, u_exact, 2);
 end
 
@@ -64,10 +65,10 @@ Tab{4} = '$L^2$ (ECS-II)';
 Tab{5} = '$L^\\infty$ (ECS-II)';
 for k = 1:length(all_Mesh)
     Tab{1} = [Tab{1}, sprintf(' & mesh %d', k)];
-    Tab{2} = [Tab{2}, sprintf(' & %.2e', EBS1_L2(k))];
-    Tab{3} = [Tab{3}, sprintf(' & %.2e', EBS1_Linf(k))];
-    Tab{4} = [Tab{4}, sprintf(' & %.2e', EBS2_L2(k))];
-    Tab{5} = [Tab{5}, sprintf(' & %.2e', EBS2_Linf(k))];
+    Tab{2} = [Tab{2}, sprintf(' & %.2e', ECS1_L2(k))];
+    Tab{3} = [Tab{3}, sprintf(' & %.2e', ECS1_Linf(k))];
+    Tab{4} = [Tab{4}, sprintf(' & %.2e', ECS2_L2(k))];
+    Tab{5} = [Tab{5}, sprintf(' & %.2e', ECS2_Linf(k))];
 end
 for k = 1:5
     fprintf([Tab{k}, ' \\\\\n'])

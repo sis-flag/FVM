@@ -379,9 +379,51 @@ DOF & $\|u - u_h\|_{\infty}$ & order & DOF & $\|u - u_h\|_{\infty}$ & order \\
 
 边中点有限体积格式可以达到二阶收敛，而且在某些特殊的网格上，它比九点格式更有优势。
 
+\newpage
 \section*{用PPR技术重构边上的流量}
 
-对于某条原始网格边$E$，它是单元$K$和单元$L$的公共边。
+\subsection*{界面上的PPR技术}
+
+对于某条原始网格边$E_0$，它是单元$K$和单元$L$的公共边。单元$K$和$L$的边用$\mathcal{E}(K)$和$\mathcal{E}(L)$表示。
+
+对于扩散系数连续的情况，我们用二次多项式对所有边中点做最小二乘拟合，相当于求解优化问题
+\begin{align*}
+\min_{p \in P_2} \sum_{E \in \mathcal{E}(K) \cup \mathcal{E}(L)} |p(\bm{x}_E) - u_E|^2
+\end{align*}
+得到多项式$p(x)$，此时它的梯度$\nabla p(E_0)$就是$E_0$处关于梯度的重构，它是二阶的。然后，我们可以计算出$E_0$处的流量为$\Lambda \nabla p(E_0)$。
+
+对于扩散系数间断的情况，我们在两个单元上分别拟合两个二次多项式，同时利用流连续条件把两个多项式拼起来。这相当于求解约束优化问题
+\begin{align*}
+\min_{p_{K}, p_{L} \in P_2} & \sum_{E \in \mathcal{E}(K)} |p_{K}(\bm{x}_E) - u_E|^2 + \sum_{E \in \mathcal{E}(L)} |p_{L}(\bm{x}_E) - u_E|^2 \\
+\text{s.t.} & \quad p_{K}(\bm{x}) = p_{L}(\bm{x}) \quad \bm{x} \in {E} \\
+ & \quad \Lambda_{K} \nabla p_{K}(\bm{x}) = \Lambda_{L} \nabla p_{L}(\bm{x}) \quad \bm{x} \in {E}
+\end{align*}
+其中$\Lambda_{K} \nabla p_{K}(\bm{x}) = \Lambda_{L} \nabla p_{L}(\bm{x})$就是边界上的流量。它应该也是二阶精度的。
+
+\textbf{注意：这样做会破坏守恒性，重构出来的流量不满足在原始网格上守恒。}
+
+\subsection*{数值细节}
+
+间断系数的情况，多项式表示为
+\begin{align*}
+p_{K}(x,y) = a_{K,0} + a_{K,1} \, x + a_{K,2} \, y + a_{K,3} \, x^2 + a_{K,4} \, x \, y + a_{K,5} \, y^2
+\end{align*}
+它的梯度
+\begin{align*}
+\nabla p_{K}(x,y) =
+\left(
+\begin{matrix}
+a_{K,1} + 2 \, a_{K,3} \, x + a_{K,4} \, y \\
+a_{K,2} + 2 \, a_{K,5} \, y + a_{K,4} \, x \\
+\end{matrix}
+\right)
+\end{align*}
+
+设$E$的两个端点是对于界面上的点，可以表示为$x = x_E + $
+
+
+
+
 
 
 

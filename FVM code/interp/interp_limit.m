@@ -3,16 +3,15 @@ function up = interp_limit(Mesh, up, uc)
 
 for P = 1:Mesh.nP
     if ~Mesh.isbdp(P)
-        
         nU = Mesh.P2U{P};
         
         % monotone limit
-        Mu = max(uc(nU));
-        mu = min(uc(nU));
-        if up(P) > Mu
-            up(P) = Mu;
-        elseif up(P) < mu
-            up(P) = mu;
+        maxu = max(uc(nU));
+        minu = min(uc(nU));
+        if up(P) > maxu
+            up(P) = maxu;
+        elseif up(P) < minu
+            up(P) = minu;
         end
     end
 end

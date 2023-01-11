@@ -4,6 +4,8 @@ old_path = path;
 old_path = path(old_path, './mesh');
 old_path = path(old_path, './PDE');
 old_path = path(old_path, './interp');
+old_path = path(old_path, './scheme');
+old_path = path(old_path, './utils');
 
 %% Mesh
 Mesh = load_mesh_file('mesh/mesh3_2.txt');
@@ -18,15 +20,15 @@ for E = 1:Mesh.nE
     u_exact(E) = PDE.u(xc, yc);
 end
 
-%% EBS1
-[A, F] = mat_EBS1(Mesh, PDE);
+%% ECS1
+[A, F] = ECS1(Mesh, PDE);
 u = A \ F;
 
 L2_err = norm_edge(Mesh, u - u_exact, 2) / norm_edge(Mesh, u_exact, 2);
 Linf_err = norm_edge(Mesh, u - u_exact, inf) / norm_edge(Mesh, u_exact, inf);
 fprintf('ECS-I: L2 error %.2e, Linf error %.2e\n', L2_err, Linf_err)
 
-%% EBS1 plot
+%% ECS1 plot
 figure
 plot_func_edge(Mesh, u)
 set(gcf, 'Position', [200, 200, 240, 240])
@@ -43,15 +45,15 @@ grid on
 zlabel('u - u_{exact}')
 print('pics/m1s1err.eps','-depsc','-loose')
 
-%% EBS2
-[A, F] = mat_EBS2(Mesh, PDE);
+%% ECS2
+[A, F] = ECS2(Mesh, PDE);
 u = A \ F;
 
 L2_err = norm_edge(Mesh, u - u_exact, 2) / norm_edge(Mesh, u_exact, 2);
 Linf_err = norm_edge(Mesh, u - u_exact, inf) / norm_edge(Mesh, u_exact, inf);
 fprintf('ECS-II: L2 error %.2e, Linf error %.2e\n', L2_err, Linf_err)
 
-%% EBS2 plot
+%% ECS2 plot
 figure
 plot_func_edge(Mesh, u)
 set(gcf, 'Position', [200, 200, 240, 240])
@@ -80,15 +82,15 @@ for E = 1:Mesh.nE
     u_exact(E) = PDE.u(xc, yc);
 end
 
-%% EBS1
-[A, F] = mat_EBS1(Mesh, PDE);
+%% ECS1
+[A, F] = ECS1(Mesh, PDE);
 u = A \ F;
 
 L2_err = norm_edge(Mesh, u - u_exact, 2) / norm_edge(Mesh, u_exact, 2);
 Linf_err = norm_edge(Mesh, u - u_exact, inf) / norm_edge(Mesh, u_exact, inf);
 fprintf('ECS-I: L2 error %.2e, Linf error %.2e\n', L2_err, Linf_err)
 
-%% EBS1 plot
+%% ECS1 plot
 figure
 plot_func_edge(Mesh, u)
 view(55, 35)
@@ -105,15 +107,15 @@ grid on
 zlabel('u - u_{exact}')
 print('pics/m2s1err.eps','-depsc','-loose')
 
-%% EBS2
-[A, F] = mat_EBS2(Mesh, PDE);
+%% ECS2
+[A, F] = ECS2(Mesh, PDE);
 u = A \ F;
 
 L2_err = norm_edge(Mesh, u - u_exact, 2) / norm_edge(Mesh, u_exact, 2);
 Linf_err = norm_edge(Mesh, u - u_exact, inf) / norm_edge(Mesh, u_exact, inf);
 fprintf('ECS-II: L2 error %.2e, Linf error %.2e\n', L2_err, Linf_err)
 
-%% EBS2 plot
+%% ECS2 plot
 figure
 plot_func_edge(Mesh, u)
 set(gcf, 'Position', [200, 200, 240, 240])

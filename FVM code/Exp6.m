@@ -4,6 +4,8 @@ old_path = path;
 old_path = path(old_path, './mesh');
 old_path = path(old_path, './PDE');
 old_path = path(old_path, './interp');
+old_path = path(old_path, './scheme');
+old_path = path(old_path, './utils');
 
 PDE = linear_stab6();
 
@@ -34,7 +36,7 @@ for k = 1:length(all_Mesh)
     end
     
     weight = order2_weight(Mesh, PDE);
-    [A, F] = mat_NPS(Mesh, PDE, weight);
+    [A, F] = NPS(Mesh, PDE, weight);
     u = A \ F;
     
     Linf(k, 1) = norm_unit(Mesh, u - u_exact, inf) / ...
@@ -48,7 +50,7 @@ for k = 1:length(all_Mesh)
         u_exact(E) = PDE.u(xc, yc);
     end
     
-    [A, F] = mat_EBS1(Mesh, PDE);
+    [A, F] = ECS1(Mesh, PDE);
     u = A \ F;
     
     Linf(k, 2) = norm_edge(Mesh, u - u_exact, inf) / ...
@@ -57,7 +59,7 @@ for k = 1:length(all_Mesh)
         norm_edge(Mesh, u_exact, 2);
     
     for kg = 1:length(all_gamma)
-        [A, F] = mat_EBS2(Mesh, PDE, all_gamma(kg));
+        [A, F] = ECS2(Mesh, PDE, all_gamma(kg));
         u = A \ F;
     
         Linf(k,kg+2) = norm_edge(Mesh, u - u_exact, inf) / ...

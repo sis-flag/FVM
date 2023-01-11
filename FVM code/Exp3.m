@@ -4,6 +4,8 @@ old_path = path;
 old_path = path(old_path, './mesh');
 old_path = path(old_path, './PDE');
 old_path = path(old_path, './interp');
+old_path = path(old_path, './scheme');
+old_path = path(old_path, './utils');
 
 PDE = linear_stab1();
 
